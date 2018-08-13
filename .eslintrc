@@ -54,13 +54,6 @@
         "allowTemplateLiterals": true
       }
     ],
-    "indent": [
-      "error",
-      4,
-      {
-        "SwitchCase": 1
-      }
-    ],
     "key-spacing": [
       "error",
       {
