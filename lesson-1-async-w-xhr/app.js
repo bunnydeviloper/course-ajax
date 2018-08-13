@@ -37,5 +37,21 @@
     unsplashRequest.open('GET', `https://api.unsplash.com/search/photos?page=1&query=${searchedForText}`);
     unsplashRequest.setRequestHeader('Authorization', 'Client-ID 14a2748ef2fbdb3402b3a43c75c1da7d013c03955ae474f62e3018208fcb01db');
     unsplashRequest.send();
+
+    function addArticles() {
+      console.log('soemthing');
+      const data = JSON.parse(this.responseText);
+        console.log(data);
+      // if (data && data.results.length !== 0) {
+      //   const list = data.results;
+      // }
+    }
+    const articleRequest = new XMLHttpRequest();
+    articleRequest.onload = addArticles;
+    articleRequest.onerror = function (err) {
+      requestError(err, 'articles');
+    };
+    articleRequest.open('GET', `https://api.nytimes.come/svc/search/v2/articlesearch.json?q=${searchedForText}&api-key=11a30d51c6af4514902f1219c06fc828`);
+    articleRequest.send();
   });
 })();
