@@ -9,22 +9,18 @@
     responseContainer.innerHTML = '';
     searchedForText = searchField.value;
 
-    $.ajax({
-      url: `https://api.unsplash.com/search/photos?page=1&query=${searchedForText}`,
+    fetch(`https://api.unsplash.com/search/photos?page=1&query=${searchedForText}`, {
       headers: {
         Authorization: 'Client-ID 14a2748ef2fbdb3402b3a43c75c1da7d013c03955ae474f62e3018208fcb01db',
       },
-    }).done(addImage)
-      .fail(function (err) {
-        requestError(err, 'image');
-      });
+    }).then(response => response.json())
+    .then(addImage)
+    .catch(err => requestError(err, 'image'));
 
-    $.ajax({
-      url: `https://api.nytimes.com/svc/search/v2/articlesearch.json?q=${searchedForText}&api-key=11a30d51c6af4514902f1219c06fc828`,
-    }).done(addArticles)
-      .fail(function (err) {
-        requestError(err, 'articles');
-      });
+    fetch(`https://api.nytimes.com/svc/search/v2/articlesearch.json?q=${searchedForText}&api-key=11a30d51c6af4514902f1219c06fc828`)
+      .then(response => response.json())
+      .then(addArticles)
+      .catch(err => requestError(err, 'articles'));
   });
 
   function requestError(e, part) {
