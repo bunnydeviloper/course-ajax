@@ -9,22 +9,22 @@
     responseContainer.innerHTML = '';
     searchedForText = searchField.value;
 
-    const unsplashRequest = new XMLHttpRequest();
-    unsplashRequest.onload = addImage;
-    unsplashRequest.onerror = function (err) {
-      requestError(err, 'image');
-    };
-    unsplashRequest.open('GET', `https://api.unsplash.com/search/photos?page=1&query=${searchedForText}`);
-    unsplashRequest.setRequestHeader('Authorization', 'Client-ID 14a2748ef2fbdb3402b3a43c75c1da7d013c03955ae474f62e3018208fcb01db');
-    unsplashRequest.send();
+    $.ajax({
+      url: `https://api.unsplash.com/search/photos?page=1&query=${searchedForText}`,
+      headers: {
+        Authorization: 'Client-ID 14a2748ef2fbdb3402b3a43c75c1da7d013c03955ae474f62e3018208fcb01db',
+      },
+    }).done(addImage)
+      .fail(function (err) {
+        requestError(err, 'image');
+      });
 
-    const articleRequest = new XMLHttpRequest();
-    articleRequest.onload = addArticles;
-    articleRequest.onerror = function (err) {
-      requestError(err, 'articles');
-    };
-    articleRequest.open('GET', `https://api.nytimes.com/svc/search/v2/articlesearch.json?q=${searchedForText}&api-key=11a30d51c6af4514902f1219c06fc828`);
-    articleRequest.send();
+    $.ajax({
+      url: `https://api.nytimes.com/svc/search/v2/articlesearch.json?q=${searchedForText}&api-key=11a30d51c6af4514902f1219c06fc828`,
+    }).done(addArticles)
+      .fail(function (err) {
+        requestError(err, 'articles');
+      });
   });
 
   function requestError(e, part) {
@@ -32,24 +32,24 @@
     responseContainer.insertAdjacentHTML('beforeend', `<p class="network-warning error-${part}">Oh no! There was an error making a request for the ${part}.</p>`);
   }
 
-  function addImage() {
+  function addImage(data) {
+    // the function now has one parameter 'data'
+    // this param has already been converted from JSON to JS obj, no need JSON.parse()
     let htmlContent = '';
-    const data = JSON.parse(this.responseText);
-    if (data && data.results && data.results[0]) {
+    if (data && data.results && data.results.length > 1) {
       const firstImage = data.results[0];
       htmlContent = `<figure>
-        <img src="${firstImage.urls.regular}" alt="${searchedForText}">
+        <img src="${firstImage.urls.small}" alt="${searchedForText}">
         <figcaption>${searchedForText} by ${firstImage.user.name}</figcaption>
         </figure>`;
     } else {
-      htmlContent = '<div class="error-no-image">No images available</div>';
+      htmlContent = '<div class="error-no-image"> No images available</div>';
     }
     responseContainer.insertAdjacentHTML('afterbegin', htmlContent);
   }
 
-  function addArticles() {
+  function addArticles(data) {
     let htmlContent = '';
-    const data = JSON.parse(this.responseText);
     if (data.response && data.response.docs && data.response.docs.length > 1) {
       htmlContent = '<ul>' + data.response.docs.map(article => `<li class="article">
       <h2><a href="${article.web_url}">${article.headline.main}</a></h2>
